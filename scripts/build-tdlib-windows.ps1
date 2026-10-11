@@ -41,6 +41,18 @@ if ($LASTEXITCODE -ne 0) { throw "Failed to configure TDLib JNI for Windows x64.
 cmake --build $tdBuild --config Release --target install --parallel 2
 if ($LASTEXITCODE -ne 0) { throw "Failed to build and install TDLib for Windows x64." }
 
+$javaCmakeLists = Join-Path $javaExample "CMakeLists.txt"
+$javaCmakeContents = Get-Content $javaCmakeLists -Raw
+$javadocDependency = "add_dependencies(tdjni td_generate_java_api build_java generate_javadoc)"
+if (-not $javaCmakeContents.Contains($javadocDependency)) {
+    throw "The pinned TDLib Java JNI CMake rule changed; inspect its Javadoc dependency before building."
+}
+$javaCmakeContents = $javaCmakeContents.Replace(
+    $javadocDependency,
+    "add_dependencies(tdjni td_generate_java_api build_java)"
+)
+Set-Content -Path $javaCmakeLists -Value $javaCmakeContents -NoNewline
+
 cmake -S $javaExample -B $jniBuild -A x64 `
     "-DTd_DIR=$(Join-Path $tdInstall 'lib\cmake\Td')" `
     "-DCMAKE_INSTALL_PREFIX:PATH=$javaExample"
