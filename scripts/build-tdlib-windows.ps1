@@ -53,6 +53,20 @@ $javaCmakeContents = $javaCmakeContents.Replace(
 )
 Set-Content -Path $javaCmakeLists -Value $javaCmakeContents -NoNewline
 
+$exampleFile = Join-Path $javaExample "org\drinkless\tdlib\example\Example.java"
+if (-not (Test-Path $exampleFile)) {
+    throw "TDLib Java example source was not found at $exampleFile."
+}
+$exampleText = Get-Content $exampleFile -Raw
+$oldReplyMarkup = "new TdApi.ReplyMarkupInlineKeyboard(new TdApi.InlineKeyboardButton[][]{row, row, row});"
+$newReplyMarkup = "new TdApi.ReplyMarkupInlineKeyboard(new TdApi.InlineKeyboardButton[][]{row, row, row}, false);"
+if ($exampleText.Contains($oldReplyMarkup)) {
+    $exampleText = $exampleText.Replace($oldReplyMarkup, $newReplyMarkup)
+    Set-Content -Path $exampleFile -Value $exampleText -NoNewline
+} elseif (-not $exampleText.Contains($newReplyMarkup)) {
+    throw "The TDLib Java example's inline keyboard constructor changed; inspect it before building."
+}
+
 cmake -S $javaExample -B $jniBuild -A x64 `
     "-DTd_DIR=$(Join-Path $tdInstall 'lib\cmake\Td')" `
     "-DCMAKE_INSTALL_PREFIX:PATH=$javaExample"
