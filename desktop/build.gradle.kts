@@ -73,3 +73,23 @@ tasks.test {
     useJUnitPlatform()
 }
 
+val stageWindowsTdlibResources = tasks.register<Copy>("stageWindowsTdlibResources") {
+    dependsOn("createDistributable")
+    from(layout.projectDirectory.dir("src/main/resources/native"))
+    into(layout.buildDirectory.dir("compose/binaries/main/app/NoorConnect/app/resources/native"))
+    doFirst {
+        val tdlibJni = layout.projectDirectory.file("src/main/resources/native/tdjni.dll").asFile
+        if (!tdlibJni.isFile) {
+            throw GradleException("Windows TDLib JNI library was not staged: $tdlibJni")
+        }
+    }
+}
+
+tasks.named("createDistributable") {
+    finalizedBy(stageWindowsTdlibResources)
+}
+
+tasks.named("packageExe") {
+    dependsOn(stageWindowsTdlibResources)
+}
+
