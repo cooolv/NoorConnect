@@ -12,6 +12,7 @@ val appVersion = providers.environmentVariable("APP_VERSION")
     .orElse(providers.gradleProperty("appVersion"))
     .getOrElse("1.0.0")
 version = appVersion
+val nativePathSeparator = System.getProperty("path.separator")
 
 java {
     toolchain {
@@ -43,7 +44,7 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "com.noorconnect.desktop.MainKt"
-        jvmArgs += listOf("-Djava.library.path=\$APPDIR\\resources\\native;\$APPDIR\\runtime\\bin;\$APPDIR")
+        jvmArgs += listOf("-Djava.library.path=\$APPDIR/resources/native${nativePathSeparator}\$APPDIR/runtime/bin${nativePathSeparator}\$APPDIR")
         buildTypes {
             release {
                 proguard {

@@ -90,6 +90,9 @@ function Assert-AppImage([string]$Root) {
     if ($configText -match 'JAVA_HOME|JDK_HOME') {
         throw "Launcher config references a machine-specific Java environment variable: $($config.FullName)"
     }
+    if ($configText -notmatch '(?m)^java-options=.*-Djava\.library\.path=.*\$APPDIR/resources/native;\$APPDIR/runtime/bin') {
+        throw "Launcher config is missing the Windows TDLib native library path with forward slashes: $($config.FullName)"
+    }
 
     Write-Output "Verified application image: $Root"
     Write-Output "Launcher: $launcher"
