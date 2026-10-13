@@ -75,6 +75,7 @@ tasks.test {
 
 val stageWindowsTdlibResources = tasks.register<Copy>("stageWindowsTdlibResources") {
     dependsOn("createDistributable")
+    onlyIf { System.getProperty("os.name").startsWith("Windows", ignoreCase = true) }
     from(layout.projectDirectory.dir("src/main/resources/native"))
     into(layout.buildDirectory.dir("compose/binaries/main/app/NoorConnect/app/resources/native"))
     doFirst {
@@ -85,11 +86,10 @@ val stageWindowsTdlibResources = tasks.register<Copy>("stageWindowsTdlibResource
     }
 }
 
-tasks.named("createDistributable") {
-    finalizedBy(stageWindowsTdlibResources)
-}
-
-tasks.named("packageExe") {
-    dependsOn(stageWindowsTdlibResources)
+tasks.configureEach {
+    when (name) {
+        "createDistributable" -> finalizedBy(stageWindowsTdlibResources)
+        "packageExe" -> dependsOn(stageWindowsTdlibResources)
+    }
 }
 
