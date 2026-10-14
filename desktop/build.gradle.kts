@@ -73,24 +73,3 @@ compose.desktop {
 tasks.test {
     useJUnitPlatform()
 }
-
-val stageWindowsTdlibResources = tasks.register<Copy>("stageWindowsTdlibResources") {
-    dependsOn("createDistributable")
-    onlyIf { System.getProperty("os.name").startsWith("Windows", ignoreCase = true) }
-    from(layout.projectDirectory.dir("src/main/resources/native"))
-    into(layout.buildDirectory.dir("compose/binaries/main/app/NoorConnect/app/resources/native"))
-    doFirst {
-        val tdlibJni = layout.projectDirectory.file("src/main/resources/native/tdjni.dll").asFile
-        if (!tdlibJni.isFile) {
-            throw GradleException("Windows TDLib JNI library was not staged: $tdlibJni")
-        }
-    }
-}
-
-tasks.configureEach {
-    when (name) {
-        "createDistributable" -> finalizedBy(stageWindowsTdlibResources)
-        "packageExe" -> dependsOn(stageWindowsTdlibResources)
-    }
-}
-

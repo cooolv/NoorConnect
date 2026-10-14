@@ -9,7 +9,7 @@ $javaExample = Join-Path $tdSource "example\java"
 $tdInstall = Join-Path $javaExample "td"
 $tdBuild = Join-Path $tdSource "jnibuild"
 $jniBuild = Join-Path $javaExample "build"
-$nativeResources = Join-Path $env:GITHUB_WORKSPACE "desktop\src\main\resources\native"
+$nativeResources = Join-Path $env:GITHUB_WORKSPACE "desktop\src\main\resources\windows\native"
 $tdApiSource = Join-Path $env:GITHUB_WORKSPACE "core\tdlib\src\main\java\org\drinkless\tdlib\TdApi.java"
 
 if (-not (Select-String -Path $tdApiSource -SimpleMatch $tdCommit -Quiet)) {
